@@ -1,8 +1,22 @@
 import { Controller, Get } from '@nestjs/common';
-import { InjectBot, Start, Update } from 'nestjs-telegraf';
+import { Action, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
 import { Context ,Telegraf } from 'telegraf';
 import { actionButton } from './app.buttons';
 import { AppService } from './app.service';
+
+const todo = [{
+    id: 1,
+    name: "Buy home",
+    isCompleted: false
+},{
+    id: 2,
+    name: "Buy car",
+    isCompleted: true
+},{
+    id: 3,
+    name: "Write app",
+    isCompleted: false
+}]
 
 @Update()
 export class AppUpdate {
@@ -13,6 +27,18 @@ export class AppUpdate {
     await cxt.reply('Hi, Friend'),
     await cxt.reply('Choose Action', actionButton())
   }
+
+  @Hears('list')
+  async listAll(ctx: Context) {
+    await ctx.reply(`${
+        todo.map(todo => 
+            todo.isCompleted ? "OK" + ' ' + todo.name + '\n' : "Planned" + ' ' + todo.name + '\n').
+            join('')
+    }`)
+  }
+
+  @Hears('done')
+  async doneTask(ctx: Context) {} 
 
 
 
