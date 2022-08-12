@@ -1,10 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { Action, Hears, InjectBot, Start, Update } from 'nestjs-telegraf';
-import { Context ,Telegraf } from 'telegraf';
+import { Action, Ctx, Hears, InjectBot, Message, On, Start, Update } from 'nestjs-telegraf';
+import { Telegraf } from 'telegraf';
 import { actionButton } from './app.buttons';
 import { AppService } from './app.service';
+import { showList } from './app.utlis';
+import { Context } from './context.interface';
 
-const todo = [{
+const todos = [{
     id: 1,
     name: "Buy home",
     isCompleted: false
@@ -28,17 +30,30 @@ export class AppUpdate {
     await cxt.reply('Choose Action', actionButton())
   }
 
-  @Hears('list')
+  @Action('list')
   async listAll(ctx: Context) {
-    await ctx.reply(`${
-        todo.map(todo => 
-            todo.isCompleted ? "OK" + ' ' + todo.name + '\n' : "Planned" + ' ' + todo.name + '\n').
-            join('')
-    }`)
+    await ctx.reply(showList(todos))
   }
 
-  @Hears('done')
-  async doneTask(ctx: Context) {} 
+  @Action('done')
+  async doneTask(ctx: Context) {
+    await ctx.reply('Write task id: ')
+    ctx.session.type = 'done'
+  } 
+
+  @On('text')
+  async getMessage(@Message('text') message: string, @Ctx() ctx: Context) {
+    if (!ctx.session.type) return
+    if (ctx.session.type === 'done') {
+        const todo = todos.find( t => t.id === Number(message) )
+        if(!todo) {
+            ctx.deleteMessage()
+            ctx.reply('No id found')
+            return
+        }
+        showList(todos)
+    }
+  }
 
 
 
