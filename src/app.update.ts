@@ -41,6 +41,23 @@ export class AppUpdate {
     ctx.session.type = 'done'
   } 
 
+  @Action('edit')
+  async editTask(ctx: Context) {
+    await ctx.deleteMessage()
+    await ctx.reply('Write task id: ')
+    ctx.session.type = 'edit'
+  } 
+
+
+  @Action('remove')
+  async removeTask(ctx: Context) {
+    await ctx.deleteMessage()
+    await ctx.reply('Write task id: ')
+    ctx.session.type = 'remove'
+  } 
+
+
+
   @On('text')
   async getMessage(@Message('text') message: string, @Ctx() ctx: Context) {
     if (!ctx.session.type) return
@@ -50,8 +67,36 @@ export class AppUpdate {
             ctx.deleteMessage()
             ctx.reply('No id found')
             return
-        }
-        showList(todos)
+        };
+        todo.isCompleted = !todo.isCompleted;
+        await ctx.reply(showList(todos));
+    }
+
+    if (ctx.session.type === 'edit') {
+        const [taskId, taskName] = message.split('|');
+
+        const todo = todos.find( t => t.id === Number(taskId) )
+        if(!todo) {
+            ctx.deleteMessage()
+            ctx.reply('No id found')
+            return
+        };
+
+        todo.name = taskName;
+        await ctx.reply(showList(todos))
+
+
+    }
+
+    if (ctx.session.type == 'remove') {
+        const todo = todos.find( t => t.id === Number(message) )
+        if(!todo) {
+            ctx.deleteMessage()
+            ctx.reply('No id found')
+            return
+        };
+        todo.isCompleted = !todo.isCompleted;
+        await ctx.reply(showList(todos.filter(todo => todo.id != Number(message))));
     }
   }
 

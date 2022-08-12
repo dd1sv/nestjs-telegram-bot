@@ -7,7 +7,7 @@ export function actionButton() {
             Markup.button.callback('Tasks list','list'),
             Markup.button.callback('Tasks compeled','done'),
             Markup.button.callback('Edit Task','edit'),
-            Markup.button.callback('Delete Task','delete')
+            Markup.button.callback('Remove Task','remove')
 
         ],
         {
