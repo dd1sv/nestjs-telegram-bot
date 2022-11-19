@@ -26,7 +26,7 @@ export class AppUpdate {
 
   @Start()
   async startCommand(cxt: Context) {
-    await cxt.reply('Hi, Friend'),
+    // await cxt.reply('Hi, Friend');
     await cxt.reply('Choose Action', actionButton())
   }
 
@@ -44,7 +44,7 @@ export class AppUpdate {
   @Action('edit')
   async editTask(ctx: Context) {
     await ctx.deleteMessage()
-    await ctx.reply('Write task id: ')
+    await ctx.reply('Write task id | new task name: ')
     ctx.session.type = 'edit'
   } 
 
